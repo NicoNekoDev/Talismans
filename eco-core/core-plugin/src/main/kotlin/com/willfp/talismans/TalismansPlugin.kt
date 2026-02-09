@@ -2,14 +2,10 @@ package com.willfp.talismans
 
 import com.willfp.eco.core.command.impl.PluginCommand
 import com.willfp.eco.core.display.DisplayModule
-import com.willfp.eco.core.fast.fast
 import com.willfp.eco.core.items.Items
-import com.willfp.eco.core.items.tag.CustomItemTag
 import com.willfp.libreforge.conditions.Conditions
 import com.willfp.libreforge.loader.LibreforgePlugin
 import com.willfp.libreforge.loader.configs.ConfigCategory
-import com.willfp.libreforge.registerHolderProvider
-import com.willfp.libreforge.registerPlayerRefreshFunction
 import com.willfp.libreforge.registerSpecificHolderProvider
 import com.willfp.libreforge.registerSpecificRefreshFunction
 import com.willfp.libreforge.slot.SlotTypes
@@ -25,11 +21,13 @@ import com.willfp.talismans.talismans.util.DiscoverRecipeListener
 import com.willfp.talismans.talismans.util.TalismanChecks
 import org.bukkit.entity.Player
 import org.bukkit.event.Listener
-import org.bukkit.inventory.ItemStack
+
+internal lateinit var plugin: TalismansPlugin
+    private set
 
 class TalismansPlugin : LibreforgePlugin() {
     init {
-        instance = this
+        plugin = this
 
         TalismanChecks.registerItemStackProvider {
             TalismanBag.getTalismans(it)
@@ -37,7 +35,7 @@ class TalismansPlugin : LibreforgePlugin() {
     }
 
     override fun handleLoad() {
-        Items.registerTag(TalismanTag(this))
+        Items.registerTag(TalismanTag)
         Conditions.register(ConditionHasTalisman)
     }
 
@@ -54,8 +52,8 @@ class TalismansPlugin : LibreforgePlugin() {
     }
 
     override fun handleReload() {
-        TalismanBag.update(this)
-        TalismanChecks.reload(this)
+        TalismanBag.update()
+        TalismanChecks.reload()
     }
 
     override fun loadConfigCategories(): List<ConfigCategory> {
@@ -66,25 +64,20 @@ class TalismansPlugin : LibreforgePlugin() {
 
     override fun loadPluginCommands(): List<PluginCommand> {
         return listOf(
-            CommandTalismans(this)
+            CommandTalismans
         )
     }
 
     override fun loadListeners(): List<Listener> {
         return listOf(
-            BlockPlaceListener(),
-            DiscoverRecipeListener(this)
+            BlockPlaceListener,
+            DiscoverRecipeListener
         )
     }
 
     override fun loadDisplayModules(): List<DisplayModule> {
         return listOf(
-            TalismanDisplay(this)
+            TalismanDisplay
         )
-    }
-
-    companion object {
-        @JvmStatic
-        lateinit var instance: TalismansPlugin
     }
 }
